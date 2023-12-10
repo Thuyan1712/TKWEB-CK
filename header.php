@@ -1,76 +1,77 @@
-<?php include ("connect.php");?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
 <header class="header">
-                <div class="header-1">
-                    <p><i class="fa-regular fa-clock"></i>  T2 - T7 : 08:00-20:00</p>
-                    <div class="search-form">
-                        <form action="">
-                            <input type="text" placeholder=" Tìm kiếm......." >
-                            <button  type="submit" name="btn-search" for="search-box" class="fas fa-search"></button>
-                        </form>
-                    </div>
-                    <div class="icon-header">
-                        <!-- <div id="search-btn" class="fas fa-search"></div> -->
-                        <a href ="?act=cart"><div id="cart" class="fa fa-shopping-cart"></div></a>
-                        <div id="login-btn" class="fa-regular fa-user"></div>
-                    </div>    
-                </div>
-                <div class ="header-2">
-                    <div class="container-header-2">
-                        <div class="logo">
-                            <a href="#" ><img src="img/logo.png" alt=""></a>
-                        </div>
-                        <nav class ="navbar">
-                            <ul class ="nav"> 
-                                <?php
-                                    $sql_menu = mysqli_query($conn,"SELECT * FROM danhmuc");
-                                    $danhmuc = mysqli_fetch_all($sql_menu, MYSQLI_ASSOC);
-                                    // $sql_danhmuc = mysqli_query($conn,"SELECT * FROM danhmuc");
-                                    
-                                    foreach($danhmuc as $row_dm){
-                                        echo "<li><a href='?act=" . $row_dm['url'] . "&id=" . $row_dm['id_dm'] . "'>" . $row_dm['name_dm'] . "</a>";
-                                        // echo "<li><a href ='?act=sanpham&id=$row_dm['id_dm']'>".$row_dm['name_dm']."</a>";
-                                            $sql_menu = $conn->prepare("SELECT * FROM danhmuc_sp WHERE id_dm = ?");
-                                            $sql_menu->bind_param("i", $row_dm['id_dm']);
-                                            $sql_menu->execute();
-                                            $result = $sql_menu ->get_result();
-                                            $dm_sp = $result->fetch_all(MYSQLI_ASSOC);
+    <div class="header-1">
+        <p><i class="fa-regular fa-clock"></i> T2 - T7 : 08:00-20:00</p>
+        <div class="search-form">
+            <form action="">
+                <input type="text" placeholder=" Tìm kiếm.......">
+                <button type="submit" name="btn-search" for="search-box" class="fas fa-search"></button>
+            </form>
+        </div>
+        <div class="icon-header">
+            <!-- <div id="search-btn" class="fas fa-search"></div> -->
+            <div id="cart" class="fa fa-shopping-cart"></div>
+            <!-- <div id="login-btn" class="fa-regular fa-user"> -->
+            <a href="login.php" class="icon-header"><i class="fa-regular fa-user"></i></a>
+            <a href="logout.php" class="icon-header"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
+        </div>
 
-                                            if(count($dm_sp)>0){
-                                                echo "<ul class ='nav'> ";
+        <?php
+        $conn = mysqli_connect("localhost", "root", "", "tatshop") or die('connection failed');
+        $isLoggedIn = true;
+        if($isLoggedIn) {
+            $userId = 1;
+            $query = "SELECT name FROM user WHERE id = $userId";
+            $result = $conn->query($query);
 
-                                                // $sql_pro=mysqli_query($conn,"SELECT * FROM product p JOIN loaisanpham l ON p.MaLSP = l.MaLSP WHERE p.MaLSP= ".$_GET['id']." ORDER BY p.MaLSP DESC ");
-                                                // while($row_pro=mysqli_fetch_array($sql_pro) ){
-                                                 
-                                               
-                                               
-                                                foreach($dm_sp as $row_dm_sp){
-                                                    echo "<li><a href='?act=list-sanphamDM&sp=".$row_dm_sp['MaDM']."'>".$row_dm_sp['TenDM']."</a>";
-                                                    $sql_menu =$conn->prepare("SELECT * FROM loaisanpham WHERE MaDM = ?");
-                                                    $sql_menu->bind_param("i", $row_dm_sp['MaDM']);
-                                                    $sql_menu->execute();
-                                                    $result = $sql_menu ->get_result();
-                                                    $loaisp = $result->fetch_all(MYSQLI_ASSOC);
+            if($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $name = $row['name'];
+                echo "<div class='welcome-container'>Chào mừng, $name! | <a href='logout.php'>Đăng xuất</a></div>";
+            } else {
+                echo "<div>Không tìm thấy thông tin người dùng</div>";
+            }
+        }
+        ?>
 
-                                                    if(count($loaisp)>0){
-                                                        echo "<ul class = 'nav'>";
-                                                        foreach($loaisp as $row_loaisp){
-                                                            echo "<li><a href='?act=list-sanpham&sp=".$row_loaisp['MaLSP']."&loai=".$row_loaisp['TenLSP']."'>".$row_loaisp['TenLSP']."</a></li>";
-                                                        }
-                                                        echo "</ul>";
-                                                    }
-                                                    echo" </li> ";
-                                                }
-                                                
-                                                echo "</ul>";
-                                            }
-                                            }
-                                        echo "</li>";
-                                    // }
-                                ?>
-                            </ul>
 
-                            
-                        </nav>
-                    </div>
-                </div>
-            </header>
+    </div>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .welcome-container {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <div class="header-2">
+        <div class="container-header-2">
+            <div class="logo">
+                <a href="#"><img src="img/logo.png" alt=""></a>
+            </div>
+            <nav class="navbar">
+                <a href="?act=home">trang chủ</a>
+                <a href="?act=sanpham">sản phẩm </a>
+                <a href="?act=gioithieu">giới thiệu </a>
+                <a href="?act=lienhe">liên hệ </a>
+            </nav>
+        </div>
+    </div>
+</header>
